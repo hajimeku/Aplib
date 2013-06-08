@@ -1,6 +1,7 @@
 package apollo.assetmanager 
 {
 	import flash.display.Bitmap;
+	import flash.utils.ByteArray;
 	import flash.utils.Dictionary;
 	import starling.display.Image;
 	import starling.textures.Texture;
@@ -31,15 +32,24 @@ package apollo.assetmanager
 			return instance;
 		}
 		
-		public function createTextureAtlas(_xml_link:String, _png_link:String, _name:String, _onComplete:Function = null, _onCompleteParams:Array = null):void {
+		public function createTextureAtlas(_xml_link:String, _image_link:String, _name:String, _onComplete:Function = null, _onCompleteParams:Array = null):void {
 			this.callers[_name] = { func:_onComplete, params:_onCompleteParams };
-			this.loadAssets([_xml_link, _png_link], onTexturePackComplete, [_name]);
+			var type:String = "";
+			if (_image_link.indexOf(".atf") != -1) {
+				type = ".atf";
+			}else {
+				type = ".png";
+			}
+			this.loadAssets([_xml_link, _image_link], onTexturePackComplete, [_name, type]);
 		}
 		
-		public function onTexturePackComplete(_name:String):void {
+		public function onTexturePackComplete(_name:String, _type:String):void {
 			var xml:XML = this.getXml(_name + ".xml");
-			var png:Bitmap = this.getBitmap(_name + ".png");
-			var atlas:TextureAtlas = new TextureAtlas(Texture.fromBitmap(png), xml);
+			var atlas:TextureAtlas;
+			var png:Bitmap = this.getBitmap(_name + _type);
+			if (_type == ".atf") atlas = new TextureAtlas(this.getTextureFromAtf(_name), xml);
+			if (_type == ".png") atlas = new TextureAtlas(this.getTextureFromBitmap(_name), xml);
+			
 			textureAtlasLib[_name] = atlas;
 			if (this.callers[_name].func) {
 				var func:Function = this.callers[_name].func;

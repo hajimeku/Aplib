@@ -1,6 +1,7 @@
-package debugger 
+package apollo.debugger 
 {
 	import apollo.mystage.MyStage;
+	import apollo.starlingExtensions.StarlingHandler;
 	import flash.events.KeyboardEvent;
 	import flash.system.System;
 	import flash.utils.Dictionary;
@@ -27,7 +28,7 @@ package debugger
 			debugTextfield.touchable = false;
 			this.addChild(debugTextfield);
 			
-			MyStage.getInstance().getLayer("debug").addChild(this);
+			//MyStage.getInstance().getLayer("debug").addChild(this);
 			
 			StarlingHandler.getInstance().mStarling.nativeStage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 			StarlingHandler.getInstance().mStarling.nativeStage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
@@ -46,7 +47,7 @@ package debugger
 			//shift t
 			if (keysPressed[84] && keysPressed[16]) {
 				//set token to clipboard
-				System.setClipboard(ApplicationSettings.token);
+				//System.setClipboard(ApplicationSettings.token);
 				doTrace("Token set to clipboard");
 			}
 		}

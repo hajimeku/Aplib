@@ -5,6 +5,7 @@ package apollo.assetmanager
 	import flash.events.Event;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
+	import flash.utils.ByteArray;
 	import flash.utils.Dictionary;
 	import starling.textures.Texture;
 	/**
@@ -30,8 +31,17 @@ package apollo.assetmanager
 			return texture;
 		}
 		
-		public function loadAssets(_assets:Array,_onComplete:Function, _params:Array = null, _altNames:Array = null):void {
-			var assetLoader:AssetLoader = new AssetLoader(this, _assets, _onComplete, _params, _altNames, ApplicationSettings.local);
+		public function getTextureFromAtf(_name:String, _scale:Number = 1, _mipMap:Boolean = false):Texture {
+			var texture:Texture = assetLib[_name + "texture"];
+			if (!texture) {
+				var atf:ByteArray = assetLib[_name];
+				texture = Texture.fromAtfData(atf, _scale, _mipMap);
+			}
+			return texture;
+		}
+		
+		public function loadAssets(_assets:Array,_onComplete:Function, _params:Array = null, _altNames:Array = null, _local:Boolean = true):void {
+			var assetLoader:AssetLoader = new AssetLoader(this, _assets, _onComplete, _params, _altNames, _local);
 		}
 		
 		public static function getInstance():AssetManager
@@ -47,6 +57,13 @@ package apollo.assetmanager
 				throw new Error("AssetManager: Bitmap can not be found");
 			}
 			return new Bitmap(assetLib[_name].bitmapData);
+		}
+		
+		public function getAtf(_name:String):Bitmap {
+			if (!assetLib[_name]) {
+				throw new Error("AssetManager: Bitmap can not be found");
+			}
+			return new Bitmap(assetLib[_name]);
 		}
 		
 		public function getXml(_name:String):XML {

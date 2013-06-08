@@ -1,4 +1,4 @@
-package  
+package apollo.starlingExtensions
 {
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
@@ -29,12 +29,34 @@ package
 			return instance;
 		}
 		
-		public function init(_stage:Stage, _class:Class):void {
+		public function init(_stage:Stage, _class:Class, _showStats:Boolean = true, _resize:Boolean = true):void {
 			mStarling = new Starling(_class, _stage);
 			mStarling.antiAliasing = 1;
 			mStarling.start();
-			mStarling.showStats = true;
+			mStarling.showStats = _showStats;
+			
+			if (_resize) {
+				_stage.addEventListener(Event.RESIZE, stage_resizeHandler, false, int.MAX_VALUE, true);
+			}
 		}
+		
+
+		private function stage_resizeHandler(event:Event = null):void
+		{
+			this.mStarling.stage.stageWidth = this.mStarling.nativeStage.stageWidth;
+			this.mStarling.stage.stageHeight = this.mStarling.nativeStage.stageHeight;
+
+			const viewPort:Rectangle = this.mStarling.viewPort;
+			viewPort.width = this.mStarling.nativeStage.stageWidth;
+			viewPort.height = this.mStarling.nativeStage.stageHeight;
+			try
+			{
+				this.mStarling.viewPort = viewPort;
+			}
+			catch(error:Error) {}
+		}
+
+
 		
 		public function getScreenBounds():Rectangle 
 		{
