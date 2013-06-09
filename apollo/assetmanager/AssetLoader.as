@@ -31,6 +31,7 @@ package apollo.assetmanager
 	public class AssetLoader 
 	{
 		private var loadedAssets:Array;
+		private var loadedAssetsContentCheck:Array;
 		private var assetManager:AssetManager;
 		private var onComplete:Function;
 		private var urlLoaderLib:Dictionary = new Dictionary();
@@ -40,12 +41,13 @@ package apollo.assetmanager
 		
 		public function AssetLoader(_assetManager:AssetManager, _assets:Array,_onComplete:Function, _params:Array, _altNames:Array, _local:Boolean) 
 		{
-			onComplete 		= _onComplete;
-			loadedAssets 	= _assets.concat();
-			assetManager 	= _assetManager;
-			params			= _params;
-			altNames		= _altNames;
-			local			= _local;
+			onComplete 					= _onComplete;
+			loadedAssets 				= _assets.concat();
+			loadedAssetsContentCheck 	= _assets.concat();
+			assetManager 				= _assetManager;
+			params						= _params;
+			altNames					= _altNames;
+			local						= _local;
 			
 			if (!altNames) 	altNames = [];
 			if (!params) 	params = [];
@@ -57,8 +59,7 @@ package apollo.assetmanager
 				var name:String = "";
 				if (altNames[i]) name = altNames[i];
 				else {
-					var splitArray:Array = str.split("/");
-					name = splitArray[splitArray.length - 1];
+					name = this.getNameFromUrl(str);
 				}
 	
 				var assetName:String = _assetManager.checkAssetLoaded(name);
@@ -74,11 +75,22 @@ package apollo.assetmanager
 					urlLoader.load(url);
 					
 				}else {
-					loadedAssets.splice(loadedAssets.indexOf(str));
+					loadedAssetsContentCheck.splice(loadedAssets.indexOf(str), 1);
 					//check if all assets  are loaded
-					if (!loadedAssets.length && onComplete != null) onComplete.apply(null, params);
+					if (!loadedAssetsContentCheck.length && onComplete != null) onComplete.apply(null, params);
 				}
 			}
+		}
+		
+		public function getNameFromUrl(_str:String):String 
+		{
+			var name:String = _str;
+			var splitArray:Array = _str.split("/");
+			if (splitArray.length == 1) {
+				splitArray = _str.split("\\");
+			}
+			name = splitArray[splitArray.length - 1];
+			return name;
 		}
 		
 		private function onRawAssetLoaded(e:Event):void 
@@ -87,17 +99,11 @@ package apollo.assetmanager
 			var bytes:ByteArray = urlLoader.data as ByteArray;
 			var sound:Sound;
 			var url:String;
-			var splitArray:Array;
 			var index:Number;
 			var name:String;
 			
-			//urlLoader.removeEventListener(IOErrorEvent.IO_ERROR, onIoError);
-			//urlLoader.removeEventListener(ProgressEvent.PROGRESS, onProgress);
-			//urlLoader.removeEventListener(Event.COMPLETE, onUrlLoaderComplete);
-			
 			url = urlLoaderLib[urlLoader];
-			splitArray = url.split("/");
-			name = splitArray[splitArray.length -1];
+			name = getNameFromUrl(url);
 			var dataType:String = url.split(".").pop().toLowerCase();
 			
 			index = this.loadedAssets.indexOf(url);
@@ -135,8 +141,8 @@ package apollo.assetmanager
 			}
 			
 			//check if all assets are loaded
-			loadedAssets.splice(index , 1);
-			if (!loadedAssets.length && onComplete != null) onComplete.apply(null, params);
+			loadedAssetsContentCheck.splice(this.loadedAssetsContentCheck.indexOf(url) , 1);
+			if (!loadedAssetsContentCheck.length && onComplete != null) onComplete.apply(null, params);
 		}
 
 		
@@ -153,7 +159,6 @@ package apollo.assetmanager
 		
 		private function onAssetLoaded(e:Event):void 
 		{
-			var splitArray:Array;
 			var name:String;
 			var index:Number;
 			var url:String;
@@ -162,8 +167,7 @@ package apollo.assetmanager
 			if (e.currentTarget is LoaderInfo) {
 				//handle bitmap data
 				url = urlLoaderLib[e.target.loader];
-				splitArray = url.split("/");
-				name = splitArray[splitArray.length -1];
+				name = getNameFromUrl(url);
 				
 				index = this.loadedAssets.indexOf(url);
 				if (index < 0) {
@@ -174,10 +178,10 @@ package apollo.assetmanager
 				}
 				
 				assetManager.setAsset(name, asset);
-				loadedAssets.splice(index , 1);
+				loadedAssetsContentCheck.splice(this.loadedAssetsContentCheck.indexOf(url) , 1);
 				
 				//check if all assets are loaded
-				if (!loadedAssets.length && onComplete != null) onComplete.apply(null, params);
+				if (!loadedAssetsContentCheck.length && onComplete != null) onComplete.apply(null, params);
 			}
 		}
 		
