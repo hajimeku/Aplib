@@ -31,33 +31,31 @@ package apollo.assetmanager
 	public class AssetLoader 
 	{
 		private var loadedAssets:Array;
-		private var loadedAssetsContentCheck:Array;
 		private var assetManager:AssetManager;
 		private var onComplete:Function;
 		private var urlLoaderLib:Dictionary = new Dictionary();
 		private var params:Array;
-		private var altNames:Array;
+		private var altNames:Dictionary;
 		private var local:Boolean;
 		
 		public function AssetLoader(_assetManager:AssetManager, _assets:Array,_onComplete:Function, _params:Array, _altNames:Array, _local:Boolean) 
 		{
+			if (!_altNames) 	_altNames = [];
+			if (!_params) 		_params = [];
+			
 			onComplete 					= _onComplete;
 			loadedAssets 				= _assets.concat();
-			loadedAssetsContentCheck 	= _assets.concat();
 			assetManager 				= _assetManager;
 			params						= _params;
-			altNames					= _altNames;
+			altNames					= this.createAllLibDictionary(_assets, _altNames);
 			local						= _local;
-			
-			if (!altNames) 	altNames = [];
-			if (!params) 	params = [];
 			
 			var l:Number = _assets.length;
 			for (var i:int = 0; i < l; i++) 
 			{
 				var str:String = _assets[i];
 				var name:String = "";
-				if (altNames[i]) name = altNames[i];
+				if (altNames[str]) name = altNames[str];
 				else {
 					name = this.getNameFromUrl(str);
 				}
@@ -75,11 +73,23 @@ package apollo.assetmanager
 					urlLoader.load(url);
 					
 				}else {
-					loadedAssetsContentCheck.splice(loadedAssets.indexOf(str), 1);
+					loadedAssets.splice(loadedAssets.indexOf(str), 1);
 					//check if all assets  are loaded
-					if (!loadedAssetsContentCheck.length && onComplete != null) onComplete.apply(null, params);
+					if (!loadedAssets.length && onComplete != null) onComplete.apply(null, params);
 				}
 			}
+		}
+		
+		public function createAllLibDictionary(_assets:Array, _altNames:Array):Dictionary 
+		{
+			var dic:Dictionary = new Dictionary();
+			for (var i:int = 0; i < _assets.length; i++) 
+			{
+				var asset:String = _assets[i];
+				if (_altNames.length <= i) continue;
+				dic[asset] = _altNames[i];
+			}
+			return dic;
 		}
 		
 		public function getNameFromUrl(_str:String):String 
@@ -110,8 +120,8 @@ package apollo.assetmanager
 			if (index < 0) {
 				throw new Error("Url " + url +" index is -1");
 			}
-			if (this.altNames[index]) {
-				name = this.altNames[index];
+			if (this.altNames[url]) {
+				name = this.altNames[url];
 			}
 				
 			switch (dataType)
@@ -141,8 +151,8 @@ package apollo.assetmanager
 			}
 			
 			//check if all assets are loaded
-			loadedAssetsContentCheck.splice(this.loadedAssetsContentCheck.indexOf(url) , 1);
-			if (!loadedAssetsContentCheck.length && onComplete != null) onComplete.apply(null, params);
+			loadedAssets.splice(this.loadedAssets.indexOf(url) , 1);
+			if (!loadedAssets.length && onComplete != null) onComplete.apply(null, params);
 		}
 
 		
@@ -173,15 +183,15 @@ package apollo.assetmanager
 				if (index < 0) {
 					throw new Error("Url " + url +" index is -1");
 				}
-				if (this.altNames[index]) {
-					name = this.altNames[index];
+				if (this.altNames[url]) {
+					name = this.altNames[url];
 				}
 				
 				assetManager.setAsset(name, asset);
-				loadedAssetsContentCheck.splice(this.loadedAssetsContentCheck.indexOf(url) , 1);
+				loadedAssets.splice(this.loadedAssets.indexOf(url) , 1);
 				
 				//check if all assets are loaded
-				if (!loadedAssetsContentCheck.length && onComplete != null) onComplete.apply(null, params);
+				if (!loadedAssets.length && onComplete != null) onComplete.apply(null, params);
 			}
 		}
 		
