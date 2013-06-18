@@ -15,11 +15,14 @@ package apollo.assetmanager
 	public class AssetManager 
 	{
 		private var assetLib:Dictionary = new Dictionary();
-		private static var instance:AssetManager;
+		private static var instance:AssetManager; 
+		private static var allowInstance:Boolean = false;
 		
 		public function AssetManager() 
 		{
-			
+			if (!allowInstance) {
+				throw new Error("This is a singleton, please use 'getInstance()'");
+			}
 		}
 		
 		public function getTextureFromBitmap(_name:String):Texture {
@@ -27,6 +30,7 @@ package apollo.assetmanager
 			if (!texture) {
 				var bitmap:Bitmap = assetLib[_name];
 				texture = Texture.fromBitmap(bitmap, true, false);
+				assetLib[_name + "texture"] = texture;
 			}
 			return texture;
 		}
@@ -35,7 +39,9 @@ package apollo.assetmanager
 			var texture:Texture = assetLib[_name + "texture"];
 			if (!texture) {
 				var atf:ByteArray = assetLib[_name];
-				texture = Texture.fromAtfData(atf, _scale, _mipMap);
+				texture = Texture.fromAtfData(atf, _scale);
+				//texture = Texture.fromAtfData(atf, _scale, _mipMap);
+				assetLib[_name + "texture"] = texture;
 			}
 			return texture;
 		}
@@ -47,7 +53,9 @@ package apollo.assetmanager
 		public static function getInstance():AssetManager
 		{
 			if (!instance) {
+				allowInstance = true;
 				instance = new AssetManager();
+				allowInstance = false;
 			}
 			return instance;
 		}

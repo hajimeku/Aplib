@@ -132,7 +132,6 @@ package apollo.assetmanager
 				case "fnt":
 				case "xml":
 					assetManager.setAsset(name, new XML(bytes));
-					onComplete();
 					break;
 				case "mp3":
 					sound = new Sound();
