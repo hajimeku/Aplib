@@ -1,5 +1,9 @@
 package apollo.assetmanager 
 {
+	import apollo.assetmanager.processproxy.ProcessDefault;
+	import apollo.assetmanager.processproxy.ProcessProxy;
+	import apollo.assetmanager.processproxy.ProcessSound;
+	import apollo.assetmanager.processproxy.ProcessXML;
 	import flash.display.Bitmap;
 	import flash.display.DisplayObject;
 	import flash.display.Loader;
@@ -40,40 +44,32 @@ package apollo.assetmanager
 			assetLoadManager 	= new AssetLoadManager();
 		}
 		
-		//TODO: Implement asset proxy process
 		protected function onBaseAssetLoaded(e:AssetEvent):void 
 		{
-			var asset:Asset 		= e.asset;
-			var bytes:ByteArray		= e.data as ByteArray;
-			var dataType:String 	= asset.type;
+			var asset:Asset 				= e.asset;
+			var bytes:ByteArray				= e.data as ByteArray;
+			var dataType:String 			= asset.type;
+			var processProxy:ProcessProxy;
 			
 			switch (dataType)
 			{
 				case "fnt":
 				case "xml":
-					asset.base = new XML(bytes);
+					processProxy = new ProcessXML(asset , bytes);
 					break;
 				case "mp3":
-					var sound:Sound = new Sound();
-					sound.loadCompressedDataFromByteArray(bytes, bytes.length);
-					asset.base = sound;
+					processProxy = new ProcessSound(asset , bytes);
 					break;
 				default:
-					var loader:Loader = new Loader();
 					var securityDomain:* = (asset.group.local)?null:SecurityDomain.currentDomain;
-					var loaderContext:LoaderContext = new LoaderContext(false, ApplicationDomain.currentDomain, securityDomain);
-					loaderContext.imageDecodingPolicy = ImageDecodingPolicy.ON_LOAD;
-					loader.contentLoaderInfo.addEventListener(Event.COMPLETE, asset.onDefauldAssetLoaded);
-					loader.loadBytes(bytes, loaderContext);
-					return;
+					processProxy = new ProcessDefault(asset, bytes, securityDomain, ApplicationDomain.currentDomain); 
 					break;
 			}
-			asset.finished();
 		}
 		
 		private function onAssetComplete(e:AssetEvent):void 
 		{
-			
+			this.setAsset(e.asset.name, e.asset);
 		}
 		
 		private function onAssetGroupComplete(e:AssetEvent):void 
@@ -123,14 +119,14 @@ package apollo.assetmanager
 			if (!assetLib[_name]) {
 				throw new Error("AssetManager: Bitmap can not be found");
 			}
-			return new Bitmap(assetLib[_name].bitmapData);
+			return new Bitmap(assetLib[_name].base.bitmapData);
 		}
 		
 		public function getXml(_name:String):XML {
 			if (!assetLib[_name]) {
 				throw new Error("AssetManager: xml can not be found");
 			}
-			return assetLib[_name];
+			return assetLib[_name].base;
 		}
 		
 		public function checkAssetLoaded(_name:String):String 

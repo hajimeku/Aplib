@@ -11,7 +11,7 @@ package apollo.assetmanager
 	 * ...
 	 * @author Apollo Meijer
 	 */
-	public class AtlasAssetManager extends AssetManager
+	public class AtlasAssetManager extends StarlingAssetManager
 	{
 		private var textureAtlasLib:Dictionary;
 		private var callers:Dictionary;

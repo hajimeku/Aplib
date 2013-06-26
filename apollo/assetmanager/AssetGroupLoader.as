@@ -75,7 +75,7 @@ package apollo.assetmanager
 				currentAssetLoading.group = this;
 				currentAssetLoading.name = getNameFromUrl(assetPath);
 				currentAssetLoading.path = assetPath;
-				currentAssetLoading.type = assetPath.split(".").pop().toLowerCase();;
+				currentAssetLoading.type = assetPath.split(".").pop().toLowerCase();
 				if (assetAltNames[assetPath]) {
 					currentAssetLoading.altName = assetAltNames[assetPath];
 				}
@@ -84,6 +84,7 @@ package apollo.assetmanager
 			}else {
 				if (this.onComplete != null) {
 					this.onComplete.apply(null, this.onCompleteParams);
+					this.dispatchEvent(new Event(Event.COMPLETE));
 				}
 			}
 		}

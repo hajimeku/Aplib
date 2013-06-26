@@ -1,5 +1,11 @@
 package apollo.assetmanager 
 {
+	import apollo.assetmanager.processproxy.ProcessDefault;
+	import apollo.assetmanager.processproxy.ProcessProxy;
+	import apollo.assetmanager.processproxy.ProcessSound;
+	import apollo.assetmanager.processproxy.ProcessTextureATF;
+	import apollo.assetmanager.processproxy.ProcessTextureBTM;
+	import apollo.assetmanager.processproxy.ProcessXML;
 	import flash.display.Bitmap;
 	import flash.display.Loader;
 	import flash.events.Event;
@@ -22,39 +28,35 @@ package apollo.assetmanager
 			
 		}
 		
-		override protected function onBaseAssetLoaded(e:AssetEvent):void 
+		override function onBaseAssetLoaded(e:AssetEvent):void 
 		{
-			var asset:Asset 		= e.asset;
-			var bytes:ByteArray		= e.data as ByteArray;
-			var dataType:String 	= asset.type;
+			var asset:Asset 				= e.asset;
+			var bytes:ByteArray				= e.data as ByteArray;
+			var dataType:String 			= asset.type;
+			var processProxy:ProcessProxy;
+			var securityDomain:*;
 			
 			switch (dataType)
 			{
+				case "png":
+					securityDomain = (asset.group.local)?null:SecurityDomain.currentDomain;
+					processProxy = new ProcessTextureBTM(asset, bytes, securityDomain, ApplicationDomain.currentDomain);
+					break;
 				case "atf":
-					asset.base = Texture.fromAtfData(bytes, 1, asset.finished);
-					this.setAsset(asset.name, asset);
-					return;
+					processProxy = new ProcessTextureATF(asset, bytes);
 					break;
 				case "fnt":
 				case "xml":
-					asset.base = new XML(bytes);
+					processProxy = new ProcessXML(asset , bytes);
 					break;
 				case "mp3":
-					var sound:Sound = new Sound();
-					sound.loadCompressedDataFromByteArray(bytes, bytes.length);
-					asset.base = sound;
+					processProxy = new ProcessSound(asset , bytes);
 					break;
 				default:
-					var loader:Loader = new Loader();
-					var securityDomain:* = (asset.group.local)?null:SecurityDomain.currentDomain;
-					var loaderContext:LoaderContext = new LoaderContext(false, ApplicationDomain.currentDomain, securityDomain);
-					loaderContext.imageDecodingPolicy = ImageDecodingPolicy.ON_LOAD;
-					loader.contentLoaderInfo.addEventListener(Event.COMPLETE, asset.onDefauldAssetLoaded);
-					loader.loadBytes(bytes, loaderContext);
-					return;
+					securityDomain = (asset.group.local)?null:SecurityDomain.currentDomain;
+					processProxy = new ProcessDefault(asset, bytes, securityDomain, ApplicationDomain.currentDomain); 
 					break;
 			}
-			asset.finished();
 		}
 		
 		public function getTextureFromBitmap(_name:String):Texture {

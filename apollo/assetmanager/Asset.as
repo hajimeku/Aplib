@@ -43,13 +43,6 @@ package apollo.assetmanager
 			this.urlLoader.load(url);
 		}
 		
-		public function onDefauldAssetLoaded(e:Event):void 
-		{
-			var asset:* = e.target.content;
-			this.base = asset;
-			this.finished();
-		}
-		
 		private function onRawAssetLoaded(e:Event):void 
 		{
 			var bytes:ByteArray = this.urlLoader.data as ByteArray;
@@ -61,7 +54,7 @@ package apollo.assetmanager
 		
 		private function onError(e:IOErrorEvent):void 
 		{
-			trace(e);
+			trace("- ASSET ERROR - asset:"+this.name+" can not be loaded from path:"+this.path);
 			this.dispatchEvent(new Event(Event.COMPLETE));
 		}
 		

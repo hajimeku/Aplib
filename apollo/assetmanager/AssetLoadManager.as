@@ -50,10 +50,12 @@ package apollo.assetmanager
 		private function onGroupLoadComplete(e:Event):void 
 		{
 			this.removeUniqueId(this.currentAssetGroupLoading.id);
+			this.currentAssetGroupLoading = null;
+			this.processNextGroupInQueue();
 		}
 		
 		public function sortLoadGroupsOnPrio(_getNext:Boolean = false):AssetGroupLoader {
-			this.loadGroups.sortOn("prio", Array.NUMERIC);
+			this.loadGroups.sortOn("prio", Array.NUMERIC | Array.DESCENDING);
 			if (_getNext && this.loadGroups.length) {
 				return this.loadGroups.shift();
 			}
