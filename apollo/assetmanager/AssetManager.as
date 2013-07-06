@@ -25,7 +25,7 @@ package apollo.assetmanager
 	public class AssetManager extends EventDispatcher
 	{
 		//atlas variables, always used
-		private var assetLib:Dictionary;
+		protected var assetLib:Dictionary;
 		private var assetLoadManager:AssetLoadManager;
 		
 		//singleton variables
@@ -133,6 +133,14 @@ package apollo.assetmanager
 		{
 			if (assetLib[_name]) return _name;
 			return "";
+		}
+		
+		public function getAsset(_name:String):void 
+		{
+			if (!assetLib[_name]) {
+				throw new Error("AssetManager: asset can not be found");
+			}
+			return assetLib[_name];
 		}
 		
 		public function setAsset(_name:String, _asset:Asset):void 

@@ -60,29 +60,18 @@ package apollo.assetmanager
 		}
 		
 		public function getTextureFromBitmap(_name:String):Texture {
-			var texture:Texture = assetLib[_name + "texture"];
-			if (!texture) {
-				var bitmap:Bitmap = assetLib[_name];
-				texture = Texture.fromBitmap(bitmap, true, false);
-				assetLib[_name + "texture"] = texture;
-			}
+			var texture:Texture = assetLib[_name];
 			return texture;
 		}
 		
 		public function getTextureFromAtf(_name:String, _scale:Number = 1, _mipMap:Boolean = false):Texture {
-			var texture:Texture = assetLib[_name + "texture"];
-			if (!texture) {
-				var atf:ByteArray = assetLib[_name];
-				texture = Texture.fromAtfData(atf, _scale);
-				//texture = Texture.fromAtfData(atf, _scale, _mipMap);
-				assetLib[_name + "texture"] = texture;
-			}
+			var texture:Texture = assetLib[_name];
 			return texture;
 		}
 		
 		public function getAtf(_name:String):Bitmap {
 			if (!assetLib[_name]) {
-				throw new Error("AssetManager: Bitmap can not be found");
+				throw new Error("AssetManager: ATF can not be found");
 			}
 			return new Bitmap(assetLib[_name]);
 		}
