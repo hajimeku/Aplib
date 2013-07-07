@@ -23,39 +23,19 @@ package apollo.assetmanager
 	 * ...
 	 * @author Apollo Meijer
 	 */
-	public class AssetManager extends EventDispatcher
+	public class AssetManagerBase extends EventDispatcher
 	{
 		//atlas variables, always used
 		protected var assetLib:Dictionary;
-		private var assetLoadManager:AssetLoadManager;
+		protected var assetLoadManager:AssetLoadManager;
 		
-		//singleton variables
-		private static var instance:AssetManager; 
-		private static var allowInstance:Boolean = false;
-		//---
-		
-		private var local:Boolean = false;
-		
-		public function AssetManager() 
+		public function AssetManagerBase() 
 		{
-			if (!allowInstance) {
-				throw new Error("This is a singleton, please use 'getInstance()'");
-			}
 			assetLib 			= new Dictionary();
 			assetLoadManager 	= new AssetLoadManager();
 		}
 		
-		public static function getInstance():AssetManager
-		{
-			if (!instance) {
-				allowInstance = true;
-				instance = new AssetManager();
-				allowInstance = false;
-			}
-			return instance;
-		}
-		
-		protected function onBaseAssetLoaded(e:AssetEvent):void 
+		public function onBaseAssetLoaded(e:AssetEvent):void 
 		{
 			var asset:Asset 				= e.asset;
 			var bytes:ByteArray				= e.data as ByteArray;
@@ -142,7 +122,7 @@ package apollo.assetmanager
 			return assetLib[_name];
 		}
 		
-		public function setAsset(_name:String, _asset:Asset):void 
+		public function setAsset(_name:String, _asset:*):void 
 		{
 			assetLib[_name] = _asset;
 		}

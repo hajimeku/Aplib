@@ -19,12 +19,13 @@ package apollo.assetmanager
 	
 	import starling.textures.Texture;
 	import flash.display.BitmapData;
+	import flash.utils.Dictionary;
 
 	/**
 	 * ...
 	 * @author Apollo Meijer
 	 */
-	public class StarlingAssetManager extends AssetManager
+	public class StarlingAssetManager extends AssetManagerBase
 	{
 		//singleton variables
 		private static var instance:StarlingAssetManager; 
@@ -32,7 +33,10 @@ package apollo.assetmanager
 		//---
 		public function StarlingAssetManager() 
 		{
-			
+			super();
+			if (!allowInstance) {
+				throw new Error("This is a singleton, please use 'getInstance()'");
+			}
 		}
 		
 		public static function getInstance():StarlingAssetManager
@@ -45,7 +49,7 @@ package apollo.assetmanager
 			return instance;
 		}
 		
-		override function onBaseAssetLoaded(e:AssetEvent):void 
+		override public function onBaseAssetLoaded(e:AssetEvent):void 
 		{
 			var asset:Asset 				= e.asset;
 			var bytes:ByteArray				= e.data as ByteArray;
@@ -56,7 +60,7 @@ package apollo.assetmanager
 			{
 				case "png":
 					processProxy = new ProcessTextureBTM(asset, bytes, ApplicationDomain.currentDomain);
-					asset.addEventListener(Event.COMPLETE, onPngLoadedComplete);
+					asset.addEventListener(Event.COMPLETE, onPngLoadedComplete, false, 20);
 					break;
 				case "atf":
 					processProxy = new ProcessTextureATF(asset, bytes);
@@ -77,29 +81,30 @@ package apollo.assetmanager
 		public function onPngLoadedComplete(event:Event):void
 		{
 			// TODO Auto-generated method stub
-			var target:Asset = event.currentTarget;
-			this.setAsset(target.name+"_bitmapdata", target.subbase);
+			trace("COMPLETE");
+			var asset:Asset = event.currentTarget as Asset;
+			this.setAsset(asset.name+"_bitmapData", asset.subbase.bitmapData);
 		}
 		
 		public function getBitmapData(_name:String):BitmapData {
-			if (!assetLib[_name +" _bitmapData"]) {
+			if (!this.assetLib[_name +"_bitmapData"]) {
 				throw new Error("AssetManager: BitmapData can not be found");
 			}
-			return (assetLib[_name +" _bitmapData"]);
+			return (this.assetLib[_name +"_bitmapData"]);
 		}
 		
-		public function getTexture(_name):Texture{
-			if (!assetLib[_name]) {
+		public function getTexture(_name:String):Texture{
+			if (!this.assetLib[_name]) {
 				throw new Error("AssetManager: Texture can not be found");
 			}
-			return (assetLib[_name]);
+			return (this.assetLib[_name]);
 		}
 
 		public function getAtf(_name:String):ByteArray {
-			if (!assetLib[_name]) {
+			if (!this.assetLib[_name]) {
 				throw new Error("AssetManager: ATF can not be found");
 			}
-			return new Bitmap(assetLib[_name]);
+			return this.assetLib[_name];
 		}
 		
 	}

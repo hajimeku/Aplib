@@ -6,6 +6,7 @@ package apollo.assetmanager.processproxy
 	import flash.system.SecurityDomain;
 	import flash.utils.ByteArray;
 	import starling.textures.Texture;
+	import starling.core.Starling;
 	/**
 	 * ...
 	 * @author Apollo Meijer
@@ -24,9 +25,11 @@ package apollo.assetmanager.processproxy
 		
 		override public function onDefauldAssetLoaded(e:Event):void 
 		{
-			var texture:Texture = Texture.fromBitmapData(e.target.content, mipMaps, false, scale);
+			if (Starling.context){
+				var texture:Texture = Texture.fromBitmap(e.target.content, mipMaps, false, scale);
+				this.asset.base = texture;
+			}
 			this.asset.subbase = e.target.content;
-			this.asset.base = texture;
 			this.onProcessComplete();
 		}
 	}
