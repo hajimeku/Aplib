@@ -20,14 +20,13 @@ package apollo.assetmanager
 			loadGroups 	= [];
 		}
 		
-		public function loadAssets(_assets:Array, _onComplete:Function, _onCompleteParams:Array, _altNames:Array, _prio:Number, _local:Boolean = false, _groupName:String = ""):AssetGroupLoader 
+		public function loadAssets(_assets:Array, _onComplete:Function, _onCompleteParams:Array, _altNames:Array, _prio:Number, _groupName:String = ""):AssetGroupLoader 
 		{
 			var assetLoader:AssetGroupLoader 	= new AssetGroupLoader(_assets, _altNames);
 			assetLoader.onComplete				= _onComplete;
 			assetLoader.onCompleteParams		= _onCompleteParams;
 			assetLoader.id 						= this.getUniqueId();
 			assetLoader.prio 					= _prio;
-			assetLoader.local					= _local;
 			assetLoader.groupName 				= (_groupName)?_groupName:assetLoader.id+"";
 			
 			loadGroups.push(assetLoader);
@@ -35,6 +34,11 @@ package apollo.assetmanager
 			processNextGroupInQueue();
 			
 			return assetLoader;
+		}
+		
+		
+		public function cancelGroupLoading(_groupName:String):void{
+			//TODO MAKE THIS WORK
 		}
 		
 		private function processNextGroupInQueue():void {

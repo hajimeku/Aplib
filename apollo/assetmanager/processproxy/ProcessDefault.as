@@ -15,11 +15,11 @@ package apollo.assetmanager.processproxy
 	public class ProcessDefault extends ProcessProxy 
 	{
 		
-		public function ProcessDefault(_asset:Asset, _bytes:ByteArray, _securityDomain:SecurityDomain = null, _applicationDomain:ApplicationDomain = null) 
+		public function ProcessDefault(_asset:Asset, _bytes:ByteArray, _applicationDomain:ApplicationDomain = null) 
 		{
 			super(_asset);
 			var loader:Loader = new Loader();
-			var loaderContext:LoaderContext = new LoaderContext(false, _applicationDomain, _securityDomain);
+			var loaderContext:LoaderContext = new LoaderContext(false, _applicationDomain, null);
 			loaderContext.imageDecodingPolicy = ImageDecodingPolicy.ON_LOAD;
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onDefauldAssetLoaded);
 			loader.loadBytes(_bytes, loaderContext);

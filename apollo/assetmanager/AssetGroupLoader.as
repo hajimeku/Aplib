@@ -34,7 +34,6 @@ package apollo.assetmanager
 		private var _onCompleteParams:Array;
 		private var _onComplete:Function;
 		private var _id:Number;
-		private var _local:Boolean;
 		private var _prio:Number;
 		private var _groupName:String;
 		
@@ -142,16 +141,6 @@ package apollo.assetmanager
 		public function set onCompleteParams(value:Array):void 
 		{
 			_onCompleteParams = value;
-		}
-		
-		public function get local():Boolean 
-		{
-			return _local;
-		}
-		
-		public function set local(value:Boolean):void 
-		{
-			_local = value;
 		}
 		
 		public function get prio():Number 

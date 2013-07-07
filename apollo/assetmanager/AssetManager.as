@@ -4,6 +4,7 @@ package apollo.assetmanager
 	import apollo.assetmanager.processproxy.ProcessProxy;
 	import apollo.assetmanager.processproxy.ProcessSound;
 	import apollo.assetmanager.processproxy.ProcessXML;
+	
 	import flash.display.Bitmap;
 	import flash.display.DisplayObject;
 	import flash.display.Loader;
@@ -44,6 +45,16 @@ package apollo.assetmanager
 			assetLoadManager 	= new AssetLoadManager();
 		}
 		
+		public static function getInstance():AssetManager
+		{
+			if (!instance) {
+				allowInstance = true;
+				instance = new AssetManager();
+				allowInstance = false;
+			}
+			return instance;
+		}
+		
 		protected function onBaseAssetLoaded(e:AssetEvent):void 
 		{
 			var asset:Asset 				= e.asset;
@@ -61,8 +72,7 @@ package apollo.assetmanager
 					processProxy = new ProcessSound(asset , bytes);
 					break;
 				default:
-					var securityDomain:* = (asset.group.local)?null:SecurityDomain.currentDomain;
-					processProxy = new ProcessDefault(asset, bytes, securityDomain, ApplicationDomain.currentDomain); 
+					processProxy = new ProcessDefault(asset, bytes, ApplicationDomain.currentDomain); 
 					break;
 			}
 		}
@@ -77,13 +87,12 @@ package apollo.assetmanager
 			this.dispatchEvent(e);
 		}
 		
-		public function loadAssets(_assets:Array, _onComplete:Function, _onCompleteParams:Array = null, _altNames:Array = null, _prio:Number = 10, _local:Boolean = false, _groupName:String = ""):void {
-			var local:Boolean = (!_local)?this.local:_local;
+		public function loadAssets(_assets:Array, _onComplete:Function, _onCompleteParams:Array = null, _altNames:Array = null, _prio:Number = 10, _group:String = ""):void {
 			var assets:Array 		= _assets;
 			var assetAltNames:Array = _altNames;
 			
 			var l:Number = assets.length;
-			for (var i:int = l-1; i >= 0 ; i--) 
+			for (var i:int = l-1; i >= 0 ; i--)
 			{
 				var assetName:String = assets[i];
 				if (assetAltNames && assetAltNames.length-1 >= i && assetAltNames[i]) {
@@ -99,20 +108,10 @@ package apollo.assetmanager
 				}
 			}
 			
-			var group:AssetGroupLoader = assetLoadManager.loadAssets(assets, _onComplete, _onCompleteParams, assetAltNames, _prio, local, _groupName);
+			var group:AssetGroupLoader = assetLoadManager.loadAssets(assets, _onComplete, _onCompleteParams, assetAltNames, _prio, _group);
 			group.addEventListener(AssetEvent.BASE_ASSET_LOADED, onBaseAssetLoaded);
 			group.addEventListener(AssetEvent.ASSET_COMPLETE, onAssetComplete);
 			group.addEventListener(AssetEvent.ASSET_GROUP_COMPLETE, onAssetGroupComplete);
-		}
-		
-		public static function getInstance():AssetManager
-		{
-			if (!instance) {
-				allowInstance = true;
-				instance = new AssetManager();
-				allowInstance = false;
-			}
-			return instance;
 		}
 		
 		public function getBitmap(_name:String):Bitmap {
@@ -135,7 +134,7 @@ package apollo.assetmanager
 			return "";
 		}
 		
-		public function getAsset(_name:String):void 
+		public function getAsset(_name:String):* 
 		{
 			if (!assetLib[_name]) {
 				throw new Error("AssetManager: asset can not be found");

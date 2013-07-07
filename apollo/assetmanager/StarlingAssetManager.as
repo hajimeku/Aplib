@@ -6,6 +6,7 @@ package apollo.assetmanager
 	import apollo.assetmanager.processproxy.ProcessTextureATF;
 	import apollo.assetmanager.processproxy.ProcessTextureBTM;
 	import apollo.assetmanager.processproxy.ProcessXML;
+	
 	import flash.display.Bitmap;
 	import flash.display.Loader;
 	import flash.events.Event;
@@ -15,17 +16,33 @@ package apollo.assetmanager
 	import flash.system.LoaderContext;
 	import flash.system.SecurityDomain;
 	import flash.utils.ByteArray;
+	
 	import starling.textures.Texture;
+	import flash.display.BitmapData;
+
 	/**
 	 * ...
 	 * @author Apollo Meijer
 	 */
 	public class StarlingAssetManager extends AssetManager
 	{
-		
+		//singleton variables
+		private static var instance:StarlingAssetManager; 
+		private static var allowInstance:Boolean = false;
+		//---
 		public function StarlingAssetManager() 
 		{
 			
+		}
+		
+		public static function getInstance():StarlingAssetManager
+		{
+			if (!instance) {
+				allowInstance = true;
+				instance = new StarlingAssetManager();
+				allowInstance = false;
+			}
+			return instance;
 		}
 		
 		override function onBaseAssetLoaded(e:AssetEvent):void 
@@ -34,13 +51,12 @@ package apollo.assetmanager
 			var bytes:ByteArray				= e.data as ByteArray;
 			var dataType:String 			= asset.type;
 			var processProxy:ProcessProxy;
-			var securityDomain:*;
 			
 			switch (dataType)
 			{
 				case "png":
-					securityDomain = (asset.group.local)?null:SecurityDomain.currentDomain;
-					processProxy = new ProcessTextureBTM(asset, bytes, securityDomain, ApplicationDomain.currentDomain);
+					processProxy = new ProcessTextureBTM(asset, bytes, ApplicationDomain.currentDomain);
+					asset.addEventListener(Event.COMPLETE, onPngLoadedComplete);
 					break;
 				case "atf":
 					processProxy = new ProcessTextureATF(asset, bytes);
@@ -53,23 +69,33 @@ package apollo.assetmanager
 					processProxy = new ProcessSound(asset , bytes);
 					break;
 				default:
-					securityDomain = (asset.group.local)?null:SecurityDomain.currentDomain;
-					processProxy = new ProcessDefault(asset, bytes, securityDomain, ApplicationDomain.currentDomain); 
+					processProxy = new ProcessDefault(asset, bytes, ApplicationDomain.currentDomain); 
 					break;
 			}
 		}
 		
-		public function getTextureFromBitmap(_name:String):Texture {
-			var texture:Texture = assetLib[_name];
-			return texture;
+		public function onPngLoadedComplete(event:Event):void
+		{
+			// TODO Auto-generated method stub
+			var target:Asset = event.currentTarget;
+			this.setAsset(target.name+"_bitmapdata", target.subbase);
 		}
 		
-		public function getTextureFromAtf(_name:String, _scale:Number = 1, _mipMap:Boolean = false):Texture {
-			var texture:Texture = assetLib[_name];
-			return texture;
+		public function getBitmapData(_name:String):BitmapData {
+			if (!assetLib[_name +" _bitmapData"]) {
+				throw new Error("AssetManager: BitmapData can not be found");
+			}
+			return (assetLib[_name +" _bitmapData"]);
 		}
 		
-		public function getAtf(_name:String):Bitmap {
+		public function getTexture(_name):Texture{
+			if (!assetLib[_name]) {
+				throw new Error("AssetManager: Texture can not be found");
+			}
+			return (assetLib[_name]);
+		}
+
+		public function getAtf(_name:String):ByteArray {
 			if (!assetLib[_name]) {
 				throw new Error("AssetManager: ATF can not be found");
 			}

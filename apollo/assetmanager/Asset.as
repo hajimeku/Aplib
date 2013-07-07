@@ -19,9 +19,11 @@ package apollo.assetmanager
 		private var _path:String;
 		private var _altName:String;
 		private var _base:Object;
+		private var _subbase:Object;
 		private var _type:String;
 		
 		private var urlLoader:URLLoader;
+		
 		
 		public function Asset() 
 		{
@@ -119,7 +121,16 @@ package apollo.assetmanager
 			_type = value;
 		}
 		
+		public function get subbase():Object
+		{
+			return _subbase;
+		}
 		
+		public function set subbase(value:Object):void
+		{
+			_subbase = value;
+		}
+
 	}
 
 }
