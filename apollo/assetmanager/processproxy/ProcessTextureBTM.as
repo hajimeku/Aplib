@@ -28,6 +28,9 @@ package apollo.assetmanager.processproxy
 			if (Starling.context){
 				var texture:Texture = Texture.fromBitmap(e.target.content, mipMaps, false, scale);
 				this.asset.base = texture;
+				texture.root.onRestore = function():void {
+					texture.root.uploadBitmap(e.target.content);
+				}
 			}
 			this.asset.subbase = e.target.content;
 			this.onProcessComplete();

@@ -21,6 +21,9 @@ package apollo.assetmanager.processproxy
 		{
 			super(_asset);
 			var texture:Texture = Texture.fromAtfData(_byteArray, _scale, _mipMaps, onProcessComplete);
+			texture.root.onRestore = function():void {
+				texture.root.uploadAtfData(_byteArray);
+			}
 		}
 		
 	}
