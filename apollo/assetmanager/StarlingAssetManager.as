@@ -60,7 +60,6 @@ package apollo.assetmanager
 			{
 				case "png":
 					processProxy = new ProcessTextureBTM(asset, bytes, ApplicationDomain.currentDomain);
-					asset.addEventListener(Event.COMPLETE, onPngLoadedComplete, false, 20);
 					break;
 				case "atf":
 					processProxy = new ProcessTextureATF(asset, bytes);
@@ -78,33 +77,25 @@ package apollo.assetmanager
 			}
 		}
 		
-		public function onPngLoadedComplete(event:Event):void
-		{
-			// TODO Auto-generated method stub
-			trace("COMPLETE");
-			var asset:Asset = event.currentTarget as Asset;
-			this.setAsset(asset.name+"_bitmapData", asset.subbase.bitmapData);
-		}
-		
 		public function getBitmapData(_name:String):BitmapData {
-			if (!this.assetLib[_name +"_bitmapData"]) {
+			if (!this.assetLib[_name]) {
 				throw new Error("AssetManager: BitmapData can not be found");
 			}
-			return (this.assetLib[_name +"_bitmapData"]);
+			return (this.assetLib[_name].subbase.bitmapData);
 		}
 		
 		public function getTexture(_name:String):Texture{
 			if (!this.assetLib[_name]) {
 				throw new Error("AssetManager: Texture can not be found");
 			}
-			return (this.assetLib[_name]);
+			return (this.assetLib[_name].base);
 		}
 
 		public function getAtf(_name:String):ByteArray {
 			if (!this.assetLib[_name]) {
 				throw new Error("AssetManager: ATF can not be found");
 			}
-			return this.assetLib[_name];
+			return this.assetLib[_name].base;
 		}
 		
 	}

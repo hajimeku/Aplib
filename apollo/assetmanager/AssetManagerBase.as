@@ -98,7 +98,7 @@ package apollo.assetmanager
 			if (!assetLib[_name]) {
 				throw new Error("AssetManager: Bitmap can not be found");
 			}
-			return new Bitmap(assetLib[_name].base.bitmapData);
+			return new Bitmap(assetLib[_name].base);
 		}
 		
 		public function getXml(_name:String):XML {
